@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard Kecepatan Angin</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+    canvas { max-width: 700px; margin: 40px auto; }
+  </style>
+</head>
+<body>
+  <h1>Grafik Kecepatan Angin</h1>
+  <canvas id="windChart"></canvas>
+
+  <script>
+    fetch('https://raw.githubusercontent.com/sinn347/kecepatan-angin-ethernet/refs/heads/main/data_angin.json')
+      .then(response => response.json())
+      .then(data => {
+        // Jika datanya array historis
+        let timestamps = data.map(item => new Date(item.timestamp).toLocaleTimeString());
+        let speeds = data.map(item => item.kecepatan);
+
+        const ctx = document.getElementById('windChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: timestamps,
+            datasets: [{
+              label: 'Kecepatan Angin (m/s)',
+              data: speeds,
+              fill: false,
+              borderColor: 'blue',
+              tension: 0.1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Gagal mengambil data:', error);
+        alert('Data tidak bisa dimuat. Periksa koneksi atau file JSON.');
+      });
+  </script>
+</body>
+</html>
